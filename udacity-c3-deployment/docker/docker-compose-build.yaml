@@ -2,17 +2,17 @@ version: "3"
 services:
     reverseproxy:
     build:
-    context: .
+        context: .
     image: voffoma/reverseproxy 
     backend_user:
     build:
-    context: ../../udacity-c2-restapi-user
+        context: ../../udacity-c2-restapi-user
     image: voffoma/udacity-restapi-user
     backend_feed:
     build:
-    context: ../../udacity-c2-restapi-feed 
+        context: ../../udacity-c2-restapi-feed 
     image: voffoma/udacity-restapi-feed
     frontend:
     build:
-    context: ../../udacity-c2-frontend 
+        context: ../../udacity-c2-frontend 
     image: voffoma/udacity-frontend
