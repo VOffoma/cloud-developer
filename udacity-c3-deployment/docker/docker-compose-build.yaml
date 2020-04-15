@@ -3,15 +3,15 @@ services:
     reverseproxy:
     build:
         context: .
-    image: voffoma/reverseproxy 
+        image: voffoma/reverseproxy 
     backend_user:
     build:
         context: ../../udacity-c2-restapi-user
-    image: voffoma/udacity-restapi-user
+        image: voffoma/udacity-restapi-user
     backend_feed:
     build:
         context: ../../udacity-c2-restapi-feed 
-    image: voffoma/udacity-restapi-feed
+        image: voffoma/udacity-restapi-feed
     frontend:
     build:
         context: ../../udacity-c2-frontend 
