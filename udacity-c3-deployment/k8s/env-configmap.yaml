@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+data:
+  AWS_MEDIA_BUCKET: udagram-offoma-dev
+  AWS_PROFILE: default
+  AWS_REGION: eu-west-3
+  JWT_SECRET: imabarbiegirlinabarbieworld
+  POSTGRESS_DATABASE: udagramoffomadev
+  POSTGRESS_HOST: udagramoffomadev.cp3wanv3x2k6.eu-west-3.rds.amazonaws.com
+  URL: http://localhost:8100  
+metadata:
+  name: env-config
