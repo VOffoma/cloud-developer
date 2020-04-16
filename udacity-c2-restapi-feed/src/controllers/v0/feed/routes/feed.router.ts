@@ -1,9 +1,32 @@
 import { Router, Request, Response } from 'express';
 import { FeedItem } from '../models/FeedItem';
-// import { requireAuth } from '../../users/routes/auth.router';
+import { NextFunction } from 'connect';
+import * as jwt from 'jsonwebtoken';
 import * as AWS from '../../../../aws';
+import * as c from '../../../../config/config';
 
 const router: Router = Router();
+
+export function requireAuth(req: Request, res: Response, next: NextFunction) {
+ //   return next();
+     if (!req.headers || !req.headers.authorization){
+         return res.status(401).send({ message: 'No authorization headers.' });
+     }
+     
+ 
+     const token_bearer = req.headers.authorization.split(' ');
+     if(token_bearer.length != 2){
+         return res.status(401).send({ message: 'Malformed token.' });
+     }
+     
+     const token = token_bearer[1];
+     return jwt.verify(token, c.config.jwt.secret , (err, decoded) => {
+       if (err) {
+         return res.status(500).send({ auth: false, message: 'Failed to authenticate.' });
+       }
+       return next();
+     });
+ }
 
 // Get all feed items
 router.get('/', async (req: Request, res: Response) => {
@@ -16,37 +39,26 @@ router.get('/', async (req: Request, res: Response) => {
     res.send(items);
 });
 
-//@TODO
-//Add an endpoint to GET a specific resource by Primary Key
-router.get('/:id', async(req: Request, res: Response) => {
-    if(!req.params.id){
-        return res.status(400).send('Kindly provide feed id');
-    }
-    const item = await FeedItem.findByPk(req.params.id);
-    item.url = AWS.getGetSignedUrl(item.url)
-    return res.send(item);
-})
+// Get a specific resource
+router.get('/:id', 
+    async (req: Request, res: Response) => {
+    let { id } = req.params;
+    const item = await FeedItem.findByPk(id);
+    res.send(item);
+});
 
 // update a specific resource
 router.patch('/:id', 
-    // requireAuth, 
+    requireAuth, 
     async (req: Request, res: Response) => {
         //@TODO try it yourself
-        if(!req.params.id){
-            return res.status(400).send('Kindly provide feed id');
-        }
-        if(req.body.caption || req.body.url){
-            const updatedItem = (await FeedItem.update(req.body, {returning: true, where: {id: req.params.id}}))[1][0];
-            updatedItem.url = AWS.getGetSignedUrl(updatedItem.url);
-            return res.status(200).send(updatedItem);
-        }
-        return res.status(400).send('Kindly provide update info in form of caption or image url');
+        res.send(500).send("not implemented")
 });
 
 
 // Get a signed url to put a new item in the bucket
 router.get('/signed-url/:fileName', 
-    // requireAuth, 
+    requireAuth, 
     async (req: Request, res: Response) => {
     let { fileName } = req.params;
     const url = AWS.getPutSignedUrl(fileName);
@@ -57,7 +69,7 @@ router.get('/signed-url/:fileName',
 // NOTE the file name is they key name in the s3 bucket.
 // body : {caption: string, fileName: string};
 router.post('/', 
-   // requireAuth, 
+    requireAuth, 
     async (req: Request, res: Response) => {
     const caption = req.body.caption;
     const fileName = req.body.url;
